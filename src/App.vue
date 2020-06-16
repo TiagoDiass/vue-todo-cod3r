@@ -30,17 +30,22 @@ export default {
   components: { TaskGrid, NewTask, TaskProgress },
 
   data: () => ({
-    tasks: [
-      newTask("Lavar a louça", false),
-      newTask("Comprar blusa"),
-      newTask("Fazer café", false)
-    ]
+    tasks: []
   }),
 
   computed: {
     progress() {
       const doneTasks = this.tasks.filter(task => !task.pending);
-      return parseInt((doneTasks.length / this.tasks.length) * 100);
+      return parseInt((doneTasks.length / this.tasks.length) * 100) || 0;
+    }
+  },
+
+  watch: {
+    tasks: {
+      deep: true,
+      handler() {
+        localStorage.setItem("tasks", JSON.stringify(this.tasks));
+      }
     }
   },
 
@@ -59,6 +64,11 @@ export default {
     toggleTaskState(index) {
       this.tasks[index].pending = !this.tasks[index].pending;
     }
+  },
+
+  created() {
+    const json = localStorage.getItem("tasks");
+    this.tasks = JSON.parse(json) || [];
   }
 };
 </script>
